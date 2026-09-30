@@ -1,26 +1,310 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* ---- Voomp brand tokens (from Figma variables) ---- */
+  --color-orange: var(--brand-orange);
+  --color-orange-hover: var(--brand-orange-hover);
+  --color-orange-600: var(--brand-orange-600);
+  --color-navy: var(--brand-navy);
+  --color-navy-700: var(--brand-navy-700);
+  --color-navy-800: var(--brand-navy-800);
+  --color-ink: var(--brand-ink);
+  --color-ink-muted: var(--brand-ink-muted);
+  --color-surface-muted: var(--brand-surface-muted);
+
+  /* Diagnostic states. Never used as the only signal — always paired with an
+     icon and a label, per the accessibility rules of the tools blueprint. */
+  --color-positive: var(--state-positive);
+  --color-positive-soft: var(--state-positive-soft);
+  --color-attention: var(--state-attention);
+  --color-attention-soft: var(--state-attention-soft);
+  --color-negative: var(--state-negative);
+  --color-negative-soft: var(--state-negative-soft);
+  --color-info: var(--state-info);
+  --color-info-soft: var(--state-info-soft);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/*
+  Typographic scale, derived from the Figma text styles:
+  `text 5x large` 48/48 bold · `text 4x large` 36/40 bold · h2 24 · h3 18 ·
+  `text base` 16/24 · `text small` 14/20 · `Subtitle` 12.
+  Heading steps are fluid so one class covers the whole responsive range the
+  landing was using (32→48, 26→36, 24→32) instead of per-breakpoint pixel values.
+*/
+@theme {
+  --text-display: clamp(2rem, 1.15rem + 2.6vw, 3rem);
+  --text-display--line-height: 1.08;
+  --text-display--letter-spacing: -0.015em;
+  --text-display--font-weight: 700;
+
+  --text-h1: clamp(1.625rem, 1.25rem + 1.15vw, 2.25rem);
+  --text-h1--line-height: 1.15;
+  --text-h1--letter-spacing: -0.01em;
+  --text-h1--font-weight: 700;
+
+  --text-h2: clamp(1.5rem, 1.2rem + 0.9vw, 2rem);
+  --text-h2--line-height: 1.2;
+  --text-h2--letter-spacing: -0.01em;
+  --text-h2--font-weight: 700;
+
+  --text-h3: 1.25rem;
+  --text-h3--line-height: 1.3;
+  --text-h3--font-weight: 700;
+
+  --text-h4: 1.125rem;
+  --text-h4--line-height: 1.35;
+  --text-h4--font-weight: 700;
+
+  --text-h5: 1rem;
+  --text-h5--line-height: 1.5;
+  --text-h5--font-weight: 600;
+
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.55;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.5;
+
+  --text-body-sm: 0.875rem;
+  --text-body-sm--line-height: 1.43;
+
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.33;
+
+  /* Large figures on result screens — tabular so columns stay aligned. */
+  --text-metric: clamp(1.75rem, 1.4rem + 1.1vw, 2.25rem);
+  --text-metric--line-height: 1;
+  --text-metric--letter-spacing: -0.02em;
+  --text-metric--font-weight: 700;
+
+  /* Figma `border radius`: md 6 · xl 12, plus the 20/24 used by section panels. */
+  --radius-brand-sm: 4px;
+  --radius-brand-md: 6px;
+  --radius-brand-lg: 8px;
+  --radius-brand-xl: 12px;
+  --radius-brand-2xl: 20px;
+  --radius-brand-3xl: 24px;
+
+  /* Figma `shadow/sm` and `shadow/lg`. */
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-float:
+    0 4px 6px -2px rgb(0 0 0 / 0.05), 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-pop: 0 12px 32px -8px rgb(2 2 29 / 0.18);
+
+  /* Motion. One easing for entrances (decelerating) and one springy curve for
+     the small confirmations, so the whole product moves the same way. */
+  --ease-out-brand: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  --animate-step-in: step-in 0.42s var(--ease-out-brand) both;
+  --animate-step-in-back: step-in-back 0.42s var(--ease-out-brand) both;
+  --animate-rise: rise 0.5s var(--ease-out-brand) both;
+  --animate-pop: pop 0.32s var(--ease-spring);
+  --animate-check: check 0.3s var(--ease-spring) both;
+}
+
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translate3d(32px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes step-in-back {
+  from {
+    opacity: 0;
+    transform: translate3d(-32px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes check {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+:root {
+  /* Figma: accent-orange / Button/Defaut / tailwind orange-500 */
+  --brand-orange: #f97316;
+  /* Figma: Button/Hover */
+  --brand-orange-hover: #ff822c;
+  /* Figma: V-Orange/600 */
+  --brand-orange-600: #ea580c;
+  /* Sampled from the dark sections of the design */
+  --brand-navy: #02021d;
+  --brand-navy-700: #15153d;
+  --brand-navy-800: #090929;
+  /* Figma: text-primary / Default/gray/900 */
+  --brand-ink: #111827;
+  /* Figma: text-secondary / Default/gray/500 */
+  --brand-ink-muted: #6b7280;
+  /* Figma: Default/gray/50 */
+  --brand-surface-muted: #f9fafb;
+
+  --state-positive: #15803d;
+  --state-positive-soft: #ecfdf5;
+  --state-attention: #b45309;
+  --state-attention-soft: #fffbeb;
+  --state-negative: #b91c1c;
+  --state-negative-soft: #fef2f2;
+  --state-info: #1d4ed8;
+  --state-info-soft: #eff6ff;
+
+  --background: #ffffff;
+  --foreground: var(--brand-ink);
+  --card: #ffffff;
+  --card-foreground: #09090b;
+  --popover: #ffffff;
+  --popover-foreground: #09090b;
+  --primary: var(--brand-orange);
+  --primary-foreground: #ffffff;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #f4f4f5;
+  --accent-foreground: #18181b;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: var(--brand-orange);
+  --radius: 0.625rem;
+}
+
+@layer base {
+  /* Anyone who asks for less motion gets none of it. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  html {
+    @apply font-sans;
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* Figma artboard is 1440px with an 80px gutter, so content runs 80 → 1360. */
+  .container-voomp {
+    @apply mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-12 xl:px-20;
+  }
+
+  /* Figma `Subtitle`: Inter Semi Bold 12px, uppercase, letterspaced. */
+  .eyebrow {
+    @apply text-caption font-semibold uppercase tracking-[0.2em] text-orange;
+  }
+
+  /* Comfortable reading column for the diagnostic tools — the blueprint asks
+     for a centred area rather than full-width forms on desktop. */
+  .container-tool {
+    @apply mx-auto w-full max-w-[860px] px-5 sm:px-8;
+  }
+
+  /* Shared focus ring so keyboard navigation is visible on every control. */
+  .focus-brand {
+    @apply outline-none focus-visible:ring-3 focus-visible:ring-orange/40;
+  }
+}
+
+@utility bg-navy-radial {
+  /* The dark sections use a soft radial lift toward the middle of the band */
+  background-color: var(--brand-navy);
+  background-image: radial-gradient(
+    120% 90% at 50% 45%,
+    var(--brand-navy-700) 0%,
+    var(--brand-navy-800) 45%,
+    var(--brand-navy) 100%
+  );
+}
+
+/* Hide the scrollbar on the drag-to-scroll carousels while keeping them scrollable */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
